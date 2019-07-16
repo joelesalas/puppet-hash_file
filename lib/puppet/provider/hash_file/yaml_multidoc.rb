@@ -26,13 +26,7 @@ Puppet::Type.type(:hash_file).provide(:yaml_multidoc) do
 
   def value
     begin
-      if File.exists?(@resource[:path])
-        res = []
-        YAML.load_stream(File.open(@resource[:path])) do |doc|
-          res << doc
-        end
-        res
-      end
+      YAML::load(File.read(@resource[:path])) if File.exists?(@resource[:path])
     rescue Errno::ENOENT
       Puppet.debug "Could not open #{@resource[:path]}"
     end

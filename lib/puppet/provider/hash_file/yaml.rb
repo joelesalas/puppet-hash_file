@@ -26,7 +26,7 @@ Puppet::Type.type(:hash_file).provide(:yaml) do
 
   def value
     begin
-      [ YAML::load(File.read(@resource[:path])) ] if File.exists?(@resource[:path])
+      YAML::load(File.read(@resource[:path])) if File.exists?(@resource[:path])
     rescue Errno::ENOENT
       Puppet.debug "Could not open #{@resource[:path]}"
     end
@@ -37,7 +37,11 @@ Puppet::Type.type(:hash_file).provide(:yaml) do
     Puppet.debug "mode_int is : mode_int"
     Puppet::Util.replace_file(@resource[:path], mode_int) do |file|
       file.binmode
-      file.write thehash[0].to_yaml
+      if thehash.kind_of?(Array)
+        file.write thehash[0].to_yaml
+      else
+        file.write thehash.to_yaml
+      end
       file.flush
     end
   end
